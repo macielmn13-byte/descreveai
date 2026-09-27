@@ -1,0 +1,38 @@
+{
+  "name": "descreveai",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.117.1",
+    "next": "16.3.6",
+    "openai": "^7.23.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "stripe": "^22.6.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "16.3.6",
+    "eslint-plugin-react": "^7.37.5",
+    "globals": "^17.12.0",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "typescript-eslint": "^8.70.1"
+  },
+  "allowScripts": {
+    "unrs-resolver@1.12.2": true
+  }
+}
