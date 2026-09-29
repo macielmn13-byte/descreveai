@@ -10,10 +10,18 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@neon/sdk": "^6.1.2",
+    "@neondatabase/auth": "^0.5.0-beta",
+    "@neondatabase/serverless": "^1.1.0",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.117.1",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
+    "jose": "^6.2.12",
     "next": "16.3.6",
+    "next-auth": "^4.24.15",
     "openai": "^7.23.0",
+    "pg": "^8.23.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "stripe": "^22.6.2"
@@ -34,6 +42,7 @@
     "typescript-eslint": "^8.70.1"
   },
   "allowScripts": {
-    "unrs-resolver@1.12.2": true
+    "unrs-resolver@1.12.2": true,
+    "bcrypt@6.0.0": true
   }
 }

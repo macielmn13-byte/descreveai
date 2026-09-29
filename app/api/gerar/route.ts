@@ -1,38 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseServer } from '@/lib/supabase-server'
+import { pegarUsuarioLogado } from '@/lib/auth'
+import { sql } from '@/lib/db'
 import { gerarDescricao } from '@/lib/gemini'
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await getSupabaseServer()
-
     // 1. Autenticação
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    const user = await pegarUsuarioLogado()
 
     if (!user) {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
     }
 
     // 2. Verifica limite do plano
-    const { data: perfil } = await supabase
-      .from('perfis')
-      .select('plano, geracoes_usadas, limite_geracoes')
-      .eq('id', user.id)
-      .single()
+    const [perfil] = await sql`
+      SELECT plano, geracoes_usadas, limite_geracoes
+      FROM perfis
+      WHERE user_id = ${user.id}
+    `
 
-       if (!perfil) {
-      console.log('DEBUG user.id:', user.id)
-      console.log('DEBUG user.email:', user.email)
-
-      const { data: todosPerfis, error: errPerfis } = await supabase
-        .from('perfis')
-        .select('*')
-
-      console.log('DEBUG todosPerfis:', todosPerfis)
-      console.log('DEBUG errPerfis:', errPerfis)
-
+    if (!perfil) {
       return NextResponse.json(
         { error: 'Perfil não encontrado' },
         { status: 404 }
@@ -61,19 +48,17 @@ export async function POST(req: NextRequest) {
     )
 
     // 5. Salva no banco
-    await supabase.from('geracoes').insert({
-      user_id: user.id,
-      produto,
-      caracteristicas,
-      tom,
-      resultado,
-    })
+    await sql`
+      INSERT INTO geracoes (user_id, produto, caracteristicas, tom, resultado)
+      VALUES (${user.id}, ${produto}, ${caracteristicas || ''}, ${tom || 'profissional'}, ${resultado})
+    `
 
     // 6. Incrementa contador
-    await supabase
-      .from('perfis')
-      .update({ geracoes_usadas: perfil.geracoes_usadas + 1 })
-      .eq('id', user.id)
+    await sql`
+      UPDATE perfis
+      SET geracoes_usadas = geracoes_usadas + 1
+      WHERE user_id = ${user.id}
+    `
 
     return NextResponse.json({
       resultado,
