@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { getSupabaseBrowser } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
@@ -17,6 +17,8 @@ export default function LoginPage() {
     e.preventDefault()
     setMsg('')
     setLoading(true)
+
+    const supabase = getSupabaseBrowser()
 
     try {
       if (modo === 'cadastro') {
