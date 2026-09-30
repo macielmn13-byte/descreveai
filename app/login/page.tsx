@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { getSupabaseBrowser } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
@@ -18,39 +17,26 @@ export default function LoginPage() {
     setMsg('')
     setLoading(true)
 
-    const supabase = getSupabaseBrowser()
-
     try {
-      if (modo === 'cadastro') {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password: senha,
-        })
+      const rota = modo === 'cadastro' ? '/api/cadastro' : '/api/login'
 
-        if (error) {
-          setMsg(`Erro: ${error.message}`)
-          setLoading(false)
-          return
-        }
+      const res = await fetch(rota, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, senha }),
+      })
 
-        setMsg('Conta criada! Faça login para continuar.')
-        setModo('login')
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password: senha,
-        })
+      const data = await res.json()
 
-        if (error) {
-          setMsg(`Erro: ${error.message}`)
-          setLoading(false)
-          return
-        }
-
-        router.push('/dashboard')
+      if (!res.ok) {
+        setMsg(`Erro: ${data.error || 'Erro desconhecido'}`)
+        setLoading(false)
+        return
       }
+
+      router.push('/dashboard')
     } catch (err) {
-      setMsg('Erro ao conectar. Tente novamente em alguns minutos.')
+      setMsg('Erro ao conectar. Tente novamente.')
     } finally {
       setLoading(false)
     }
