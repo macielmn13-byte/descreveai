@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-
-export default function GeradorForm() {
-  const [produto, setProduto] = useState('')
+import { useRouter } from 'next/navigation'
+export default function GeradorForm() { 
+   const [produto, setProduto] = useState('')
+  const router = useRouter()
   const [caracteristicas, setCaracteristicas] = useState('')
   const [tom, setTom] = useState('profissional')
   const [resultado, setResultado] = useState('')
@@ -32,7 +33,11 @@ export default function GeradorForm() {
 
       setResultado(data.resultado)
       setRestantes(data.restantes)
-    } catch (err) {
+      
+
+      router.refresh()                     // ← ADICIONA
+    }   catch (err) {
+  
       setErro('Erro ao conectar com o servidor')
     } finally {
       setLoading(false)

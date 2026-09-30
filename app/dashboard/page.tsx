@@ -3,6 +3,7 @@ import { sql } from '@/lib/db'
 import { redirect } from 'next/navigation'
 import GeradorForm from '@/components/GeradorForm'
 import LogoutButton from '@/components/LogoutButton'
+import HistoricoGeracoes from '@/components/HistoricoGeracoes'
 
 export default async function Dashboard() {
   const user = await pegarUsuarioLogado()
@@ -15,6 +16,14 @@ export default async function Dashboard() {
     SELECT plano, geracoes_usadas, limite_geracoes
     FROM perfis
     WHERE user_id = ${user.id}
+  `
+
+  const geracoes = await sql`
+    SELECT id, produto, resultado, criado_em
+    FROM geracoes
+    WHERE user_id = ${user.id}
+    ORDER BY criado_em DESC
+    LIMIT 10
   `
 
   return (
@@ -34,6 +43,8 @@ export default async function Dashboard() {
       <div className="border rounded-lg p-6 bg-white shadow">
         <GeradorForm />
       </div>
+
+      <HistoricoGeracoes geracoes={geracoes as any} />
     </div>
   )
 }
