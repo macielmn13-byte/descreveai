@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import GeradorForm from '@/components/GeradorForm'
 import LogoutButton from '@/components/LogoutButton'
 import HistoricoGeracoes from '@/components/HistoricoGeracoes'
-
+import Link from 'next/link'
 export default async function Dashboard() {
   const user = await pegarUsuarioLogado()
 
@@ -31,6 +31,9 @@ export default async function Dashboard() {
       <div className="flex justify-between items-start">
         <h1 className="text-3xl font-bold">Dashboard</h1>
         <div className="text-right text-sm space-y-1">
+                   <Link href="/perfil" className="text-sm text-blue-600 hover:underline">
+            Meu perfil
+          </Link>
           <p className="text-gray-500">{user.email}</p>
           <p>
             Plano: <strong>{perfil?.plano || 'free'}</strong> ·{' '}

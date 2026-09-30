@@ -105,3 +105,45 @@ export async function fazerLogout() {
   const cookieStore = await cookies()
   cookieStore.delete(COOKIE_NAME)
 }
+
+
+
+// ============================================
+// MUDAR SENHA
+// ============================================
+export async function mudarSenha(
+  userId: string,
+  senhaAtual: string,
+  novaSenha: string
+) {
+  // Busca o usuário
+  const [usuario] = await sql`
+    SELECT senha_hash FROM usuarios WHERE id = ${userId}
+  `
+
+  if (!usuario) {
+    throw new Error('Usuário não encontrado')
+  }
+
+  // Verifica se a senha atual está certa
+  const senhaCorreta = await bcrypt.compare(senhaAtual, usuario.senha_hash)
+
+  if (!senhaCorreta) {
+    throw new Error('Senha atual incorreta')
+  }
+
+  // Valida nova senha
+  if (novaSenha.length < 6) {
+    throw new Error('Nova senha deve ter no mínimo 6 caracteres')
+  }
+
+  // Hash da nova senha
+  const novoHash = await bcrypt.hash(novaSenha, 10)
+
+  // Atualiza no banco
+  await sql`
+    UPDATE usuarios SET senha_hash = ${novoHash} WHERE id = ${userId}
+  `
+
+  return true
+}
