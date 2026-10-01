@@ -5,6 +5,7 @@ import GeradorForm from '@/components/GeradorForm'
 import LogoutButton from '@/components/LogoutButton'
 import HistoricoGeracoes from '@/components/HistoricoGeracoes'
 import Link from 'next/link'
+import UpgradeButton from '@/components/UpgradeButton'
 export default async function Dashboard() {
   const user = await pegarUsuarioLogado()
 
@@ -39,6 +40,9 @@ export default async function Dashboard() {
             Plano: <strong>{perfil?.plano || 'free'}</strong> ·{' '}
             {perfil?.geracoes_usadas || 0}/{perfil?.limite_geracoes || 5}
           </p>
+                    <div className="mt-2">
+            <UpgradeButton plano={perfil?.plano || 'free'} />
+          </div>
           <LogoutButton />
         </div>
       </div>
