@@ -47,3 +47,12 @@ audit.txt
 fix.js
 .env.example.txt
 *.tmp
+
+# Arquivos grandes (não commitar)
+*.zip
+*.png
+*.jpeg
+*.jpg
+!public/**/*.png
+!app/**/*.png
+!public/**/*.svg
