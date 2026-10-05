@@ -51,7 +51,18 @@ export default async function Dashboard() {
         <GeradorForm />
       </div>
 
-      <HistoricoGeracoes geracoes={geracoes as any} />
+         <div className="border rounded-lg p-6 bg-white shadow">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold">Histórico</h2>
+          <a
+            href="/api/exportar"
+            className="text-sm text-blue-600 hover:underline"
+          >
+            📥 Baixar CSV
+          </a>
+        </div>
+        <HistoricoGeracoes geracoes={geracoes as any} />
+            </div>
     </div>
   )
 }
