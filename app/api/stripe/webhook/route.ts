@@ -41,10 +41,15 @@ export async function POST(req: NextRequest) {
 
         console.log('Cliente pagou:', email)
 
-        // Atualiza o usuário pra PRO
+        // Extrai customer_id do Stripe (pra usar no cancelamento)
+        const customerId = session.customer as string
+
+        // Atualiza o usuário pra PRO + salva customer_id
         await sql`
           UPDATE perfis
-          SET plano = 'pro', limite_geracoes = 200
+          SET plano = 'pro',
+              limite_geracoes = 200,
+              stripe_customer_id = ${customerId}
           WHERE user_id IN (
             SELECT id FROM usuarios WHERE email = ${email}
           )
