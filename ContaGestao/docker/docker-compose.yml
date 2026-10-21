@@ -1,0 +1,88 @@
+# =====================================================================
+#  ContaGestão – ambiente completo (API + worker + PostgreSQL + Redis)
+#  Uso (na raiz do projeto):
+#     docker compose -f docker/docker-compose.yml up -d --build
+#  Produção: some o arquivo docker-compose.prod.yml (veja o LEIAME.md)
+# =====================================================================
+name: contagestao
+
+x-app: &app
+  build:
+    context: ..
+    dockerfile: docker/Dockerfile
+  image: ${IMAGE:-contagestao:latest}
+  env_file: ../.env
+  environment:
+    DATABASE_URL: postgres://contagestao:${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}@db:5432/contagestao
+    REDIS_URL: redis://redis:6379
+    QUEUE_MODE: bullmq
+    DB_AUTO_MIGRATE: 'false'
+    STORAGE_LOCAL_PATH: /app/data/storage
+  volumes:
+    - storage:/app/data/storage
+  restart: unless-stopped
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: contagestao
+      POSTGRES_USER: contagestao
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}
+      TZ: America/Sao_Paulo
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U contagestao -d contagestao']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ['redis-server', '--appendonly', 'yes', '--maxmemory-policy', 'noeviction']
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  migrate:
+    <<: *app
+    command: ['node', 'scripts/migrar.js']
+    restart: 'no'
+    depends_on:
+      db:
+        condition: service_healthy
+
+  api:
+    <<: *app
+    command: ['node', 'src/server.js']
+    ports:
+      - '${API_PORT:-8000}:8000'
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+  worker:
+    <<: *app
+    command: ['node', 'src/worker.js']
+    healthcheck:
+      disable: true
+    stop_grace_period: 60s
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  redisdata:
+  storage:

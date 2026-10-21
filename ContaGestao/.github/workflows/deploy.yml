@@ -1,0 +1,87 @@
+# Publicação: gera a imagem, envia ao GitHub Container Registry (GHCR)
+# e atualiza o servidor via SSH.
+#
+# Dispara ao criar uma tag de versão (ex.: git tag v1.0.0 && git push --tags)
+# ou manualmente na aba Actions.
+#
+# Segredos necessários (Settings > Secrets and variables > Actions):
+#   DEPLOY_HOST      IP ou domínio do servidor
+#   DEPLOY_USER      usuário SSH (ex.: deploy)
+#   DEPLOY_SSH_KEY   chave privada SSH (conteúdo completo)
+#   DEPLOY_PATH      pasta do projeto no servidor (ex.: /opt/contagestao)
+name: Deploy
+
+on:
+  push:
+    tags: ['v*.*.*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE: ghcr.io/${{ github.repository_owner }}/contagestao
+
+jobs:
+  publicar:
+    runs-on: ubuntu-24.04
+    outputs:
+      tag: ${{ steps.meta.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Normalizar nome da imagem (minúsculas)
+        run: echo "IMAGE=${IMAGE,,}" >> "$GITHUB_ENV"
+
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=sha
+            type=raw,value=latest
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  servidor:
+    runs-on: ubuntu-24.04
+    needs: publicar
+    environment: producao
+    steps:
+      - name: Atualizar servidor
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          IMAGE_TAG: ${{ needs.publicar.outputs.tag }}
+          REPO_OWNER: ${{ github.repository_owner }}
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          envs: IMAGE_TAG,REPO_OWNER
+          script: |
+            set -e
+            cd "${{ secrets.DEPLOY_PATH }}"
+            git pull --ff-only
+            export IMAGE="ghcr.io/${REPO_OWNER,,}/contagestao:${IMAGE_TAG}"
+            COMPOSE="docker compose --env-file .env -f docker/docker-compose.yml -f docker/docker-compose.prod.yml"
+            $COMPOSE pull api worker migrate
+            $COMPOSE up -d --no-build
+            docker image prune -f

@@ -1,0 +1,73 @@
+{
+  "name": "contagestao",
+  "version": "1.0.0",
+  "description": "ContaGestão – Soluções Inteligentes: captura, OCR e extração inteligente de documentos (faturas, contratos e formulários)",
+  "private": true,
+  "type": "module",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=20.11"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "start:worker": "node src/worker.js",
+    "dev": "node --watch src/server.js",
+    "dev:worker": "node --watch src/worker.js",
+    "migrate": "node scripts/migrar.js",
+    "gerar-chaves": "node scripts/gerar-chaves.js",
+    "exemplo:pdf": "node scripts/criar-pdf-exemplo.js",
+    "test": "node --test --test-concurrency=1 \"tests/**/*.test.js\"",
+    "test:unit": "node --test \"tests/unit/**/*.test.js\"",
+    "test:integration": "node --test --test-concurrency=1 \"tests/integration/**/*.test.js\"",
+    "lint": "eslint src tests scripts migrations",
+    "lint:frontend": "npm --prefix frontend run lint",
+    "build:frontend": "npm --prefix frontend run build",
+    "format": "prettier --write .",
+    "docker:up": "docker compose --env-file .env -f docker/docker-compose.yml up -d --build",
+    "docker:down": "docker compose --env-file .env -f docker/docker-compose.yml down",
+    "docker:logs": "docker compose --env-file .env -f docker/docker-compose.yml logs -f api worker",
+    "docker:prod": "docker compose --env-file .env -f docker/docker-compose.yml -f docker/docker-compose.prod.yml up -d --build",
+    "docker:prod:logs": "docker compose --env-file .env -f docker/docker-compose.yml -f docker/docker-compose.prod.yml logs -f api worker"
+  },
+  "keywords": [
+    "ocr",
+    "llm",
+    "nfe",
+    "extração",
+    "documentos"
+  ],
+  "author": "Kodama e Maciel Assessoria e Consultoria Tributária Ltda.",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.135.0",
+    "@aws-sdk/client-s3": "^3.1152.0",
+    "@aws-sdk/client-textract": "^3.1152.0",
+    "@napi-rs/canvas": "^1.0.11",
+    "better-sqlite3": "^13.0.3",
+    "bullmq": "^6.3.17",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.8",
+    "exceljs": "^4.4.0",
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.1",
+    "helmet": "^8.3.0",
+    "ioredis": "^6.0.0",
+    "knex": "^3.3.0",
+    "multer": "^2.4.0",
+    "openai": "^7.39.0",
+    "pdfjs-dist": "^6.4.299",
+    "pg": "^8.23.1",
+    "pino": "^10.4.0",
+    "pino-http": "^11.0.0",
+    "sharp": "^0.35.5",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.13.0",
+    "globals": "^17.13.0",
+    "pino-pretty": "^13.2.0",
+    "prettier": "^3.9.10",
+    "supertest": "^7.3.1"
+  }
+}

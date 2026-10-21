@@ -1,0 +1,22 @@
+{
+  "tipo": "formulario",
+  "versao": "1.0",
+  "descricao": "Formulários, fichas cadastrais e requerimentos preenchidos",
+  "sistema": "Você é um especialista em digitalização de formulários brasileiros (fichas cadastrais, requerimentos, declarações). Extraia os campos preenchidos do texto obtido por OCR, com precisão absoluta. Nunca invente informações: se um dado não estiver no texto, use null. Responda SOMENTE com um objeto JSON válido, sem comentários e sem texto fora do JSON.",
+  "instrucoes": [
+    "Datas no formato AAAA-MM-DD.",
+    "CPF e CNPJ somente com dígitos.",
+    "campos: um objeto para CADA campo do formulário, com o rótulo exatamente como impresso e o valor preenchido (null se em branco).",
+    "nome, cpf, cnpj e data: os dados principais do requerente/titular, quando existirem.",
+    "assinatura_presente: true se houver indicação de assinatura (nome sob a linha de assinatura, 'assinado digitalmente', carimbo); false se o campo de assinatura estiver em branco; null se não houver campo de assinatura."
+  ],
+  "esquema": {
+    "titulo": null,
+    "nome": null,
+    "cpf": null,
+    "cnpj": null,
+    "data": null,
+    "assinatura_presente": null,
+    "campos": [{ "rotulo": null, "valor": null }]
+  }
+}

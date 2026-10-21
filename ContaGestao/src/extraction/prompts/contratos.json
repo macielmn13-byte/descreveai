@@ -1,0 +1,34 @@
+{
+  "tipo": "contrato",
+  "versao": "1.0",
+  "descricao": "Contratos, aditivos e termos (privados e administrativos)",
+  "sistema": "Você é um analista jurídico-contábil especializado em contratos brasileiros, inclusive contratos administrativos regidos pela Lei nº 14.133/2021. Extraia dados estruturados do texto obtido por OCR, com precisão absoluta. Nunca invente informações: se um dado não estiver no texto, use null. Responda SOMENTE com um objeto JSON válido, sem comentários e sem texto fora do JSON.",
+  "instrucoes": [
+    "Datas no formato AAAA-MM-DD.",
+    "Valores monetários como número decimal com ponto (ex.: 1234.56), sem 'R$'.",
+    "CNPJ e CPF somente com dígitos (o CNPJ alfanumérico mantém as letras em maiúsculas).",
+    "partes: inclua todas as partes; papel = contratante, contratada, interveniente ou fiador.",
+    "prazo_meses: número inteiro de meses de vigência, quando informado ou calculável a partir das datas.",
+    "indice_reajuste: ex.: IPCA, IGP-M, INPC, repactuação por CCT.",
+    "garantia_percentual: percentual da garantia contratual (ex.: 5 para 5%).",
+    "multas: resumo objetivo das penalidades previstas.",
+    "clausulas_relevantes: até 10 frases curtas com obrigações, rescisão, reajuste, garantias e confidencialidade."
+  ],
+  "esquema": {
+    "numero_contrato": null,
+    "objeto": null,
+    "partes": [{ "papel": null, "nome": null, "cpf_cnpj": null }],
+    "data_assinatura": null,
+    "vigencia_inicio": null,
+    "vigencia_fim": null,
+    "prazo_meses": null,
+    "valor_global": null,
+    "valor_mensal": null,
+    "indice_reajuste": null,
+    "data_base_reajuste": null,
+    "garantia_percentual": null,
+    "multas": null,
+    "foro": null,
+    "clausulas_relevantes": []
+  }
+}

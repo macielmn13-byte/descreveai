@@ -1,0 +1,53 @@
+{
+  "tipo": "fatura",
+  "versao": "1.0",
+  "descricao": "Notas fiscais (NF-e, NFS-e, NFC-e), faturas, boletos e recibos",
+  "sistema": "Você é um especialista em documentos fiscais brasileiros (NF-e, NFS-e, NFC-e, faturas, boletos e recibos). Sua tarefa é extrair dados estruturados do texto obtido por OCR, com precisão absoluta. Nunca invente informações: se um dado não estiver no texto, use null. Responda SOMENTE com um objeto JSON válido, sem comentários e sem texto fora do JSON.",
+  "instrucoes": [
+    "Datas no formato AAAA-MM-DD.",
+    "Valores monetários como número decimal com ponto (ex.: 1234.56), sem 'R$' e sem separador de milhar.",
+    "CNPJ e CPF somente com dígitos (o CNPJ alfanumérico mantém as letras em maiúsculas).",
+    "chave_acesso: os 44 dígitos da chave da NF-e, sem espaços; linha_digitavel: os 47 dígitos do boleto, sem pontos ou espaços.",
+    "emitente = quem emitiu a nota (prestador/fornecedor); destinatario = tomador/cliente.",
+    "valor_produtos_servicos = soma bruta dos itens; valor_total = valor total da nota; valor_liquido = valor a pagar após retenções (se houver).",
+    "impostos: preencha apenas os valores destacados no documento (ICMS, IPI, PIS, COFINS, ISS, IRRF, CSLL, INSS).",
+    "itens: um objeto por linha de produto ou serviço; se o documento não detalhar itens, use lista vazia.",
+    "competencia: mês/ano de referência quando informado (ex.: '10/2026')."
+  ],
+  "esquema": {
+    "tipo_documento": "NF-e | NFS-e | NFC-e | fatura | boleto | recibo | outro",
+    "numero": null,
+    "serie": null,
+    "data_emissao": null,
+    "data_vencimento": null,
+    "competencia": null,
+    "emitente": {
+      "razao_social": null,
+      "cnpj": null,
+      "inscricao_estadual": null,
+      "inscricao_municipal": null,
+      "endereco": null
+    },
+    "destinatario": { "nome": null, "cpf_cnpj": null, "endereco": null },
+    "itens": [{ "descricao": null, "quantidade": null, "valor_unitario": null, "valor_total": null }],
+    "valor_produtos_servicos": null,
+    "valor_desconto": null,
+    "valor_frete": null,
+    "impostos": {
+      "icms": null,
+      "ipi": null,
+      "pis": null,
+      "cofins": null,
+      "iss": null,
+      "irrf": null,
+      "csll": null,
+      "inss": null
+    },
+    "valor_total": null,
+    "valor_liquido": null,
+    "chave_acesso": null,
+    "linha_digitavel": null,
+    "forma_pagamento": null,
+    "observacoes": null
+  }
+}

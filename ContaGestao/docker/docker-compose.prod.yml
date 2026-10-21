@@ -1,0 +1,62 @@
+# =====================================================================
+#  Ajustes de PRODUÇÃO (use junto com docker-compose.yml):
+#     docker compose -f docker/docker-compose.yml -f docker/docker-compose.prod.yml up -d
+#  - Nginx com HTTPS na frente da API (portas 80/443)
+#  - API sem porta exposta diretamente
+#  - Reinício sempre, limites de recursos e logs com rotação
+# =====================================================================
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: '20m'
+    max-file: '5'
+
+services:
+  db:
+    restart: always
+    logging: *logging
+
+  redis:
+    restart: always
+    logging: *logging
+
+  api:
+    restart: always
+    ports: !reset []
+    environment:
+      NODE_ENV: production
+      TRUST_PROXY: 'true'
+      LOG_PRETTY: 'false'
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2g
+    logging: *logging
+
+  worker:
+    restart: always
+    environment:
+      NODE_ENV: production
+      LOG_PRETTY: 'false'
+    deploy:
+      replicas: ${WORKER_REPLICAS:-1}
+      resources:
+        limits:
+          cpus: '2'
+          memory: 3g
+    logging: *logging
+
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+      - ./nginx/acme:/var/www/acme:ro
+    depends_on:
+      - api
+    restart: always
+    logging: *logging
